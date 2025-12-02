@@ -25,7 +25,7 @@ pre-commit:
       stage-fixed: true
 
     - name: TypeScript 📄
-      run: bun tsc --noEmit
+      run: bun tsgo --noEmit
 
     - name: Tests 🧪
       run: bun test --pass-with-no-tests
