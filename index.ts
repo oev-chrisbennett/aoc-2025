@@ -1,12 +1,8 @@
-import { Glob } from "bun"
+import { readdir } from "node:fs/promises"
 
 const srcDir = `${import.meta.dir}/src`
 
-const glob = new Glob("*/index.ts")
-const days = [...glob.scanSync(srcDir)]
-    .map((p) => p.split("/")[0])
-    .filter((dir): dir is string => dir !== undefined && /^\d+$/.test(dir))
-    .sort()
+const days = (await readdir(srcDir)).filter((dir) => /^\d+$/.test(dir)).sort()
 
 type Result = { partA: string | number; partB: string | number }
 
@@ -15,10 +11,12 @@ const results: { day: string; partA: string; partB: string }[] = []
 for (const day of days) {
     try {
         const modulePath = `${srcDir}/${day}/index.ts`
+        const inputPath = `${srcDir}/${day}/input.txt`
+        const input = await Bun.file(inputPath).text()
         const module = await import(modulePath)
 
         if (typeof module.default === "function") {
-            const result: Result = await module.default()
+            const result: Result = await module.default(input)
             results.push({
                 day,
                 partA: String(result?.partA ?? "N/A"),
